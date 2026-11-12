@@ -1,0 +1,7 @@
+- insert:
+    - id: agy-runner
+      name: 'dsh-agy'
+      config:
+        bin: 'C:\Users\Administrator\AppData\Local\agy\bin\agy.exe'
+        timeoutSec: 900
+        skipPermissions: true

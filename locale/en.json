@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Antigravity CLI",
+    "description": "Wraps the local agy (Antigravity CLI) as tools: hand it a whole job — read a repo, edit files, run commands, generate images — and get the answer plus the conversation id back. The settings page checks the environment and lets you clear conversations."
+  }
+}

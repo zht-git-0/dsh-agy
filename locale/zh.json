@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Antigravity CLI",
+    "description": "把本机的 agy（Antigravity CLI）接成工具：可以派给它整件事——读项目、改代码、跑命令、生图，再把结果和会话 id 带回来；设置页里能检查环境、清会话。"
+  }
+}
