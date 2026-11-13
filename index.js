@@ -347,6 +347,37 @@ export function apply(ctx, config = {}) {
             if (pathname === '/' || pathname === '/status' || pathname === '/check') {
               return send(200, await checkEnv())
             }
+            if (pathname === '/install-cli') {
+              // 官方给了一条命令装 CLI：irm https://antigravity.google/cli/install.ps1 | iex
+              if (fs.existsSync(bin)) {
+                return send(200, clean({ ok: true, already: true, bin, note: '这个路径下已经有 agy 了' }))
+              }
+              if (process.platform !== 'win32') {
+                return send(200, {
+                  ok: false,
+                  error: '一键安装只做在 Windows 上',
+                  hint: '其他平台看 https://antigravity.google/download 里的安装方式',
+                })
+              }
+              const script = 'irm https://antigravity.google/cli/install.ps1 | iex'
+              const run = await runProcess('powershell.exe', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-Command', script], {
+                timeoutSec: 300,
+              })
+              const output = `${run.stdout ?? ''}${run.stderr ?? ''}`.trim().slice(0, 6000)
+              const installed = fs.existsSync(bin)
+              return send(
+                200,
+                clean({
+                  ok: installed,
+                  installed,
+                  bin,
+                  exitCode: run.code,
+                  output,
+                  error: installed ? undefined : '装完了但没在预期路径找到 agy，看输出里的实际位置',
+                }),
+              )
+            }
+
             if (pathname === '/install') {
               if (!fs.existsSync(bin)) {
                 return send(200, {

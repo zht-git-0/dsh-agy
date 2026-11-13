@@ -111,6 +111,19 @@ window.__ModuleLoader__.load({
         load()
       }, [load])
 
+      const installCli = async () => {
+        setBusy(true)
+        setOutput('')
+        try {
+          const body = await api('/install-cli', { method: 'POST' })
+          setOutput(body.output || body.note || body.hint || JSON.stringify(body))
+          await load()
+        } catch (error) {
+          setOutput('安装失败：' + String((error && error.message) || error))
+        }
+        setBusy(false)
+      }
+
       const install = async () => {
         setBusy(true)
         setOutput('')
@@ -158,6 +171,13 @@ window.__ModuleLoader__.load({
             state.loading ? '检查中…' : '重新检查',
           ),
           h('button', { style: S.btn, onClick: install, disabled: busy || !okBin }, busy ? '执行中…' : '运行 agy install'),
+          okBin
+            ? null
+            : h(
+                'button',
+                { style: Object.assign({}, S.btn, S.btnPrimary), onClick: installCli, disabled: busy },
+                busy ? '安装中…' : '安装 Antigravity CLI',
+              ),
         ),
         state.error ? h('div', { style: Object.assign({}, S.out, S.bad) }, '检查失败：' + state.error) : null,
         output ? h('div', { style: S.out }, output) : null,

@@ -28,21 +28,55 @@ DSH 自己已经能开子智能体（`subagent` / `spawn_teammate`），但那�
 1. 本机装了 Antigravity CLI。Windows 默认在 `%LOCALAPPDATA%\agy\bin\agy.exe`，其他平台在 PATH 里叫 `agy`。
 2. **已经登录过**（见下一节）。没登录的话所有工具都会报 `authentication failed`。
 
+**没装 agy 的话，一条命令就够**（官方安装器）：
+
+```powershell
+irm https://antigravity.google/cli/install.ps1 | iex
+```
+
+CMD 里等价写法：
+
+```cmd
+curl -fsSL https://antigravity.google/cli/install.cmd -o install.cmd && install.cmd && del install.cmd
+```
+
+装完 `agy --help` 有输出就成了。**或者直接用设置页的按钮**：检测不到 agy 时，「环境」那张卡会出现「安装 Antigravity CLI」，点它插件替你跑上面那条命令。
+
+> 顺带说一句：用户**不需要自己装 Node**。这个插件跑在 DeepSeek Harness 的宿主进程里，用的是宿主自带的运行时，装插件时 pnpm 也是 DSH 自带的。唯一的外部依赖就是 agy 这个可执行文件。
+
 ### 装插件
 
-从本地目录装（开发用）：
+先说清楚 `plugin_manager install_bundle` 是什么：它**不是终端里的 shell 命令**，是 DeepSeek Harness 自己的一个安装工具，参数 `target` 就是「从哪装」——本地目录、npm 包名、或者 `github:用户/仓库` 都行。一条命令换个 target 就是另一种装法。
+
+**方式一：在设置界面里装（推荐）**
+
+打开 **设置 → 插件**，在安装入口里填：
 
 ```
-plugin_manager install_bundle target=<这个目录的绝对路径>
+github:<用户名>/<仓库>
 ```
 
-从 GitHub 装：
+确定即可。界面会拉包、装进当前 profile。
+
+**方式二：让 AI 在会话里装**
+
+跟她说「装一下 github:用户名/仓库」，等价于她调用：
 
 ```
 plugin_manager install_bundle target=github:<用户名>/<仓库>
 ```
 
+**方式三：本地开发**
+
+改完代码还没推的时候，target 直接指目录：
+
+```
+plugin_manager install_bundle target=<这个目录的绝对路径>
+```
+
 装完打开 **设置 → Antigravity CLI**，看到这一页就说明装好了。
+
+> GitHub 安装要求：仓库根目录有 `package.json`，且 `package.json` 里声明了 `dsh.bundle.patch`；纯 JS 包不需要构建。
 
 ### 确认能用
 
@@ -163,7 +197,7 @@ agy_session({ action: "delete", session: "ai_game 批处理", purge: true }) // 
 
 ## 设置页
 
-**环境**：二进制路径、存不存在、能不能跑、会话数；「重新检查」和「运行 agy install」（跑 `agy install` 重置环境路径）。
+**环境**：二进制路径、存不存在、能不能跑、会话数；「重新检查」和「运行 agy install」（跑 `agy install` 重置环境路径）。**没装 agy 时**这里会多出一个「安装 Antigravity CLI」按钮，点它跑官方安装器。
 
 **登录**：只有一个「打开登录窗口」按钮，见上面那一节。
 
@@ -203,6 +237,7 @@ agy_session({ action: "delete", session: "ai_game 批处理", purge: true }) // 
 | POST | `/session/delete` | 软删 / `purge` 彻底删 | 有（删除 / 彻底删） |
 | POST | `/session/restore` | 从回收站恢复 | 有（放回） |
 | POST | `/login/console` | 弹一个真终端去登录 | 有（打开登录窗口） |
+| POST | `/install-cli` | 跑官方安装器装 Antigravity CLI | 有（检测不到 agy 时出现） |
 | POST | `/session/new` | 新建（同名则续） | 没有，只给工具用 |
 | POST | `/session/rename` | 改名 | 没有，只给工具用 |
 
